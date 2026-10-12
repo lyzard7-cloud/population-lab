@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f5f8f6" />
+  <meta name="description" content="출생·사망·이입·이출과 서식지 크기를 조절하며 개체군 밀도를 직접 탐구하는 생명과학 시뮬레이션" />
+  <title>Population Lab | 개체군 밀도 실험실</title>
+  <style>
+    :root {
+      font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #173042;
+      background: #f5f8f6;
+      font-synthesis: none;
+      -webkit-font-smoothing: antialiased;
+      --ink: #173042;
+      --muted: #6c7d84;
+      --line: #dfeae7;
+      --green: #268a67;
+      --green-light: #e5f6ed;
+      --coral: #d76664;
+      --coral-light: #fff0ed;
+      --white: #fff;
+      --shadow: 0 16px 46px rgba(22, 52, 56, .060);
+    }
+    *, *::before, *::after {box-sizing: border-box;}
+    body {margin: 0; min-width: 320px;}
+    button {font: inherit; cursor:pointer; -webkit-tap-highlight-color:transparent;}
+    button:focus-visible {outline:3px solid #4a9fec; outline-offset:3px;}
+    button:disabled {cursor:not-allowed; opacity:.48;}
+    .app {max-width:1224px; margin:0 auto; padding:30px 27px 42px;}
+    .topbar {display:flex; justify-content:space-between; align-items:center; gap:15px;}
+    .brand {display:flex; gap:11px; align-items:center;}
+    .brand-icon {width:42px; height:42px; border-radius:14px; display:grid; place-items:center; background:#dff4e8; color:#198363;}
+    .brand-name {font-size:16px; letter-spacing:.04em; font-weight:900; line-height:1.15;}
+    .brand-sub {font-size:11px; color:var(--muted); margin-top:3px; font-weight:600; letter-spacing:.06em;}
+    .tag {border:1px solid #d6e5df; border-radius:99px; font-size:12px; color:#637e76; font-weight:700; background:#fff; padding:9px 13px; white-space:nowrap;}
+    .intro {margin:27px 0 23px;}
+    .eyebrow {font-weight:800; font-size:11px; letter-spacing:.12em; color:#299472; display:flex; align-items:center; gap:8px;}
+    .eyebrow::before {content:""; width:18px; height:2px; border-radius:3px; background:#299472;}
+    h1 {margin:8px 0 9px; font-size:clamp(27px, 3.2vw, 39px); letter-spacing:-.065em; line-height:1.28; font-weight:850; word-break:keep-all;}
+    h1 span {color:#248d69;}
+    .intro p {font-size:14px; line-height:1.7; margin:0; color:var(--muted); word-break:keep-all;}
+    .selector-heading {display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; gap:12px;}
+    h2 {font-size:17px; margin:0; letter-spacing:-.04em; font-weight:800;}
+    .small-helper {color:#87979b; font-size:12px;}
+    .species-grid {display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:12px; margin-bottom:18px;}
+    .species-card {display:flex; align-items:center; gap:13px; text-align:left; padding:13px 16px; min-height:78px; border-radius:18px; background:#fff; border:2px solid transparent; box-shadow: 0 5px 20px rgba(14, 46, 55, .04); color:var(--ink); transition: transform .18s, border-color .18s, background .18s;}
+    .species-card:hover {transform:translateY(-2px);}
+    .species-card[aria-pressed="true"] {border-color:#45b392; background:#f1fcf6;}
+    .species-emoji {display:grid; place-items:center; background:#f2f6f2; border-radius:14px; width:50px; height:50px; flex:0 0 50px; font-size:31px;}
+    .species-card[aria-pressed="true"] .species-emoji {background:#dff5e7;}
+    .species-title {font-size:17px; font-weight:850; letter-spacing:-.04em;}
+    .species-sub {font-size:12px; color:#7b8c90; margin-top:3px;}
+    .selected-indicator {margin-left:auto; color:#228d68; opacity:0; font-size:20px; font-weight:850;}
+    .species-card[aria-pressed="true"] .selected-indicator {opacity:1;}
+    .lab-grid {display:grid; grid-template-columns:minmax(0, 1.55fr) minmax(340px, 1fr); gap:17px; align-items:stretch;}
+    .card {border-radius:23px; background:#fff; box-shadow:var(--shadow); border:1px solid #edf1ef; min-width:0;}
+    .scene-card {padding:15px; display:flex; flex-direction:column;}
+    .scene-top {display:flex; justify-content:space-between; align-items:center; gap:8px; padding:5px 4px 13px;}
+    .live-tag {display:flex; gap:7px; align-items:center; color:#527369; font-size:12px; font-weight:850; letter-spacing:.035em;}
+    .live-dot {width:9px; height:9px; border-radius:50%; background:#30bd8b; box-shadow:0 0 0 4px #e3f6ee;}
+    .scene-context {color:#869590; font-size:12px; font-weight:650;}
+    .scene {height:520px; min-height:310px; overflow:hidden; position:relative; border-radius:18px; isolation:isolate; background:linear-gradient(177deg,#d3f3e4 0%,#a5dabe 58%,#8ec9a8 100%);}
+    .scene::before {content:""; position:absolute; inset:0; z-index:-2; background:radial-gradient(ellipse at 15% 8%,rgba(255,255,255,.64) 0 11%,transparent 13%),radial-gradient(ellipse at 89% 84%,rgba(45,140,102,.12) 0 18%,transparent 20%);}
+    .scene::after {content:""; position:absolute; width:120%; height:130px; left:-10%; bottom:-65px; border-radius:50%; background:rgba(59, 151, 103, .13); z-index:-1;}
+    .scene.savanna {background:linear-gradient(160deg,#fce7b4 0%,#e8c985 68%,#d6b66f 100%);}
+    .scene.savanna::after {background:rgba(172,129,57,.11);}
+    .scene.pond {background:linear-gradient(155deg,#b8e9f0 0%,#82c8db 48%,#5aafc9 100%);}
+    .scene.pond::after {background:rgba(31,119,158,.11);}
+    .sun {position:absolute; top:50px; right:52px; background:#fff9d2; width:53px; height:53px; border-radius:50%; opacity:.85; box-shadow:0 0 0 16px rgba(255,255,255,.14);}
+    .scene.pond .sun {opacity:.45;}
+    .tree {position:absolute; width:53px; height:75px; opacity:.65; pointer-events:none;}
+    .tree::before {content:""; position:absolute; width:9px; height:43px; background:#777e48; left:22px; bottom:0; border-radius:6px;}
+    .tree::after {content:""; position:absolute; width:58px; height:50px; border-radius:50% 50% 47% 50%; background:#67ae70; top:0; left:-2px; box-shadow:-11px 10px 0 -9px #388b67;}
+    .tree.one {left:20px; bottom:33px; transform:scale(.85);}
+    .tree.two {right:32px; bottom:53px; transform:scale(1.12);}
+    .scene.savanna .tree::before {background:#83653b;}
+    .scene.savanna .tree::after {background:#b19f4e; border-radius:65% 55% 60% 55%;}
+    .scene.pond .tree {display:none;}
+    .lily {position:absolute; width:55px; height:26px; background:rgba(46,154,127,.54); border-radius:50%; transform:rotate(-18deg); display:none;}
+    .lily::before {content:""; position:absolute; inset:-4px 24px 10px 18px; background:#79c9d6; transform:rotate(39deg);}
+    .lily.one {left:7%; top:27%;}
+    .lily.two {right:10%; bottom:18%; transform:rotate(23deg) scale(.78);}
+    .scene.pond .lily {display:block;}
+    .habitat-zone {position:absolute; top:52%; left:50%; transform:translate(-50%,-50%); width:65%; height:67%; border-radius:23px; border:2.5px dashed rgba(255,255,255,.92); background:rgba(255,255,255,.13); box-shadow: inset 0 0 32px rgba(255,255,255,.11),0 6px 24px rgba(14,84,52,.045); transition:width .5s ease, height .5s ease; overflow:hidden;}
+    .habitat-zone:focus {outline:3px solid #fff;}
+    .zone-caption {position:absolute; bottom:14px; left:14px; color:#f7fffc; background:rgba(30,81,70,.27); border:1px solid rgba(255,255,255,.30); backdrop-filter:blur(3px); border-radius:30px; padding:7px 10px; font-size:11px; font-weight:800; pointer-events:none; white-space:nowrap; z-index:5;}
+    .animal {position:absolute; display:block; top:50%; left:50%; transform:translate(-50%,-50%); font-size:27px; line-height:1; user-select:none; pointer-events:none; text-shadow:0 3px 5px rgba(0,0,0,.11); z-index:2; transition:left 2.9s ease-in-out, top 2.9s ease-in-out; white-space:nowrap;}
+    .animal .sway {display:block; animation:swim 3.4s ease-in-out infinite; animation-delay:var(--delay, 0s);}
+    .animal.born {animation:popIn .48s cubic-bezier(.17,1.5,.39,1) both;}
+    .animal.incoming {animation:walkIn .9s cubic-bezier(.25,.65,.3,1) both;}
+    .animal.leaving {animation:fadeAway .43s ease-in both;}
+    .animal.outgoing {animation:walkOut .8s ease-in both;}
+    .animal.compact {font-size:22px;}
+    @keyframes swim {0%,100%{transform:translate(0,0) rotate(-5deg)} 50%{transform:translate(3px,-5px) rotate(5deg)}}
+    @keyframes popIn {from{opacity:0;scale:.1}to{opacity:1;scale:1}}
+    @keyframes fadeAway {to{opacity:0;scale:.25}}
+    @keyframes walkIn {from {opacity:0; transform:translate(calc(-50% - 140px),-50%);} to {opacity:1;transform:translate(-50%,-50%);}}
+    @keyframes walkOut {to {opacity:0;transform:translate(calc(-50% + 150px),-50%);}}
+    .zone-label {position:absolute; top:14px; left:14px; padding:8px 11px; font-size:12px; font-weight:850; background:rgba(255,255,255,.88); border-radius:11px; color:#376958; z-index:6; pointer-events:none;}
+    .scene.pond .zone-label {color:#337d92;}
+    .scene.savanna .zone-label {color:#977138;}
+    .scene-bottom {display:flex; justify-content:space-between; align-items:center; gap:10px; padding:13px 4px 2px; color:#778c85; font-size:12px; line-height:1.5;}
+    .scene-bottom strong {color:#487d6b; font-weight:800;}
+    .hidden-count {color:#78978c; font-weight:700; text-align:right;}
+    .control-card {padding:22px; display:flex; flex-direction:column; gap:14px;}
+    .control-head {display:flex; justify-content:space-between; align-items:center; gap:8px;}
+    .reset-btn {background:#f4f7f6; border:1px solid #e7eeea; border-radius:10px; padding:9px 12px; color:#6b827c; font-size:12px; font-weight:800; white-space:nowrap;}
+    .reset-btn:hover {background:#e7f4ec;}
+    .mission-ribbon {display:flex;flex-direction:column;gap:5px;border:1px solid #f2dbb0;background:#fff8e9;border-radius:13px;padding:11px 13px;color:#8b6a2b;line-height:1.5;}
+    .mission-ribbon[hidden]{display:none;}
+    .mission-ribbon .mission-ribbon-tag {font-size:10px;font-weight:900;letter-spacing:.08em;}
+    .mission-ribbon strong {font-size:12px;font-weight:750;word-break:keep-all;}
+    .density-card {padding:17px 20px 16px; background:linear-gradient(123deg,#1d6050,#236f59 62%,#308668); color:#fff; border-radius:18px; position:relative; overflow:hidden;}
+    .density-card::after {content:""; position:absolute; width:120px; height:120px; border:1px solid rgba(255,255,255,.12); border-radius:50%; right:-30px; top:-54px; box-shadow:0 0 0 22px rgba(255,255,255,.045),0 0 0 52px rgba(255,255,255,.035);}
+    .density-title {font-size:12px; font-weight:700; color:#c5e7d9;}
+    .density-row {display:flex; align-items:baseline; gap:10px; margin-top:5px; flex-wrap:wrap;}
+    .density-number {font-weight:900; font-size:clamp(39px,4vw,53px); letter-spacing:-.06em; font-variant-numeric:tabular-nums; line-height:1.15;}
+    .density-unit {font-size:14px; font-weight:700; color:#d2f3e2;}
+    .density-trend {margin-top:5px; font-size:12px; color:#e1f4eb; min-height:17px;}
+    .metrics {display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+    .metric {border:1px solid #e8efec; border-radius:14px; padding:13px 14px; background:#f9fbfa;}
+    .metric-caption {font-size:12px; color:#768984; font-weight:750;}
+    .metric-main {font-size:26px; font-weight:900; letter-spacing:-.06em; margin-top:4px; font-variant-numeric:tabular-nums; white-space:nowrap;}
+    .metric-main span {font-size:13px; letter-spacing:0; color:#7f928b; font-weight:700; margin-left:3px;}
+    .panel-label {display:flex; justify-content:space-between; align-items:center; gap:5px; margin-top:2px;}
+    .panel-label h3 {font-size:14px; margin:0; letter-spacing:-.03em;}
+    .panel-label small {color:#92a19c; font-weight:700; font-size:11px;}
+    .event-grid {display:grid; grid-template-columns:1fr 1fr; gap:9px;}
+    .event-btn {border:1px solid transparent; border-radius:14px; min-height:62px; display:flex; align-items:center; justify-content:space-between; padding:11px 13px; transition:transform .16s, background .16s; text-align:left;}
+    .event-btn:not(:disabled):active {transform:scale(.965);}
+    .event-btn:not(:disabled):hover {filter:brightness(.975);}
+    .event-btn .event-name {font-weight:850; font-size:15px; color:#214334;}
+    .event-btn .event-desc {font-size:10px; color:#82968c; margin-top:3px;}
+    .event-btn .count {font-size:15px; font-weight:900; white-space:nowrap; margin-left:7px;}
+    .event-btn.plus {background:var(--green-light); border-color:#d1f0df;}
+    .event-btn.plus .count {color:#16865e;}
+    .event-btn.minus {background:var(--coral-light); border-color:#fde1dc;}
+    .event-btn.minus .event-name {color:#733e41;}
+    .event-btn.minus .count {color:#cc6a63;}
+    .areas {display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px;}
+    .area-btn {border:1px solid #e3ece7; background:#f8faf9; padding:11px 4px; border-radius:11px; font-size:12px; color:#74867e; font-weight:850; min-height:43px;}
+    .area-btn[aria-pressed="true"] {background:#daf2e5; border-color:#52bd93; color:#17734e;}
+    .help-line {margin:0; font-size:11px; color:#82938d; line-height:1.5;}
+    .below-grid {display:grid; grid-template-columns: minmax(0,1.2fr) minmax(0,.8fr); gap:17px; margin-top:17px; align-items:stretch;}
+    .graph-card,.calc-card {padding:21px 22px;}
+    .section-top {display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:17px;}
+    .section-label {font-size:12px; font-weight:750; color:#82968c; white-space:nowrap;}
+    .chart-wrap {width:100%; height:198px; position:relative;}
+    #densityChart {width:100%; height:100%; display:block;}
+    .legend {display:flex; gap:7px; align-items:center; color:#788d86; font-size:11px; font-weight:700; margin-top:6px;}
+    .legend::before {content:""; width:17px; height:3px; background:#2baf81; border-radius:5px;}
+    .calc-inner {padding:15px; background:#f4f8f6; border-radius:14px;}
+    .formula-title {font-size:11px; font-weight:800; color:#758d82; margin-bottom:10px;}
+    .frac {display:flex; align-items:center; justify-content:center; gap:12px; font-weight:850; font-size:15px; color:#274b3f;}
+    .fraction {display:flex; flex-direction:column; text-align:center; align-items:stretch; min-width:100px;}
+    .fraction span:first-child {border-bottom:2px solid #527e70; padding:0 7px 5px;}
+    .fraction span:last-child {padding:5px 7px 0;}
+    .formula-num {font-size:21px; font-weight:900; color:#177d5c; letter-spacing:-.03em; white-space:nowrap;}
+    .equation {font-size:12px; color:#637d71; text-align:center; line-height:1.7; margin-top:12px; padding:0 2px; overflow-wrap:anywhere;}
+    .log-head {font-size:12px; font-weight:800; margin:15px 0 8px;}
+    .activity-list {display:flex; flex-direction:column; gap:7px; margin:0; padding:0; list-style:none;}
+    .activity-list li {display:flex; justify-content:space-between; gap:8px; padding:7px 0; color:#6c8177; font-size:12px; border-bottom:1px solid #f0f3f2;}
+    .activity-list li:last-child {border-bottom:none;}
+    .activity-list .activity-name {font-weight:750;}
+    .activity-list .activity-value {white-space:nowrap; color:#2b735b; font-weight:800;}
+    .mission-card {margin-top:17px; padding:23px;}
+    .mission-title {display:flex; align-items:center; gap:10px;}
+    .mission-symbol {width:36px; height:36px; display:grid; place-items:center; border-radius:12px; background:#fff4db; font-size:21px;}
+    .mission-intro {color:#81918d; font-size:12px; margin:7px 0 18px; line-height:1.6;}
+    .mission-grid {display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px;}
+    .mission-btn {background:#f9fbfa; text-align:left; min-height:105px; border:1.5px solid #e5ece8; border-radius:15px; padding:15px; color:var(--ink); display:flex; flex-direction:column; justify-content:space-between;}
+    .mission-btn:hover {border-color:#91cbb1;}
+    .mission-btn[aria-pressed="true"] {background:#eaf9ef; border-color:#37a77e;}
+    .mission-btn .mission-no {font-size:11px; font-weight:850; color:#70a48f;}
+    .mission-btn .mission-name {font-weight:850; font-size:15px; margin-top:7px; letter-spacing:-.04em;}
+    .mission-btn .mission-desc {font-size:11px; color:#82918b; margin-top:5px; line-height:1.5; word-break:keep-all;}
+    .mission-complete {font-size:11px; color:#188662; font-weight:850;}
+    .mission-detail {display:none; background:#f1f8f4; border:1px solid #d9ebde; margin-top:13px; border-radius:14px; padding:15px;}
+    .mission-detail.active {display:block;}
+    .mission-detail-top {display:flex; justify-content:space-between; align-items:flex-start; gap:10px;}
+    .mission-statement {font-size:14px; color:#28624a; line-height:1.65; font-weight:750; margin:0; word-break:keep-all;}
+    .hint-btn {background:#fff; color:#4b8b6b; border:1px solid #cee7d6; border-radius:9px; padding:9px 12px; white-space:nowrap; font-size:11px; font-weight:800;}
+    .hint-text {color:#5d826f; font-size:12px; line-height:1.7; margin:10px 0 0; display:none;}
+    .hint-text.active {display:block;}
+    .mission-success {display:none; padding:11px 14px; background:#e2f5e6; border-radius:11px; color:#237b51; font-weight:850; font-size:13px; margin-top:11px;}
+    .mission-success.active {display:block;}
+    .lesson-note {display:flex; gap:12px; background:#e9f2f0; padding:17px 20px; border-radius:17px; margin-top:17px; color:#56776b; align-items:flex-start; font-size:13px; line-height:1.7; word-break:keep-all;}
+    .lesson-note .bulb {font-size:20px;}
+    .lesson-note strong {color:#2b6953;}
+    footer {display:flex; justify-content:space-between; gap:8px; margin-top:24px; color:#99aaa2; font-size:11px;}
+    .toast {position:fixed; bottom:22px; left:50%; transform:translate(-50%,14px); background:#173f35; color:#fff; padding:13px 19px; border-radius:13px; box-shadow:0 14px 42px #15352a30; font-size:13px; font-weight:700; z-index:100; opacity:0; pointer-events:none; transition:opacity .22s, transform .22s; width:max-content; max-width:calc(100vw - 36px); text-align:center; line-height:1.45;}
+    .toast.show {opacity:1; transform:translate(-50%,0);}
+    @media(max-width:990px) {
+      .app{padding:25px 18px 36px;}
+      .lab-grid{grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);gap:13px;}
+      .below-grid{gap:13px;}
+      .control-card{padding:17px;gap:12px;}
+      .scene{height:440px;}
+      .animal {font-size:24px;}
+      .species-card{gap:9px;padding:11px;}
+      .selected-indicator{display:none;}
+      .species-emoji{width:46px;height:46px;flex-basis:46px;}
+    }
+    @media(max-width:760px) {
+      .app{padding:17px 13px 27px;}
+      .tag{font-size:10px;padding:8px 9px;}
+      .brand-icon{width:39px;height:39px;flex:0 0 39px;}
+      .brand-name{font-size:14px;}
+      .brand-sub{font-size:10px;}
+      .intro{margin:23px 1px 20px;}
+      .intro p{font-size:13px;}
+      .selector-heading{margin-bottom:10px;}
+      .species-grid{gap:7px;margin-bottom:12px;}
+      .species-card{border-radius:13px;min-height:93px;display:flex;flex-direction:column;justify-content:center;gap:4px;padding:9px 4px;text-align:center;}
+      .species-emoji{width:39px;height:39px;flex-basis:39px;border-radius:12px;font-size:25px;}
+      .species-title{font-size:14px;}
+      .species-sub{font-size:10px;margin-top:1px;}
+      .lab-grid,.below-grid{grid-template-columns:1fr;gap:12px;}
+      .scene-card{padding:10px;}
+      .scene-top{padding:6px 5px 11px;}
+      .scene{height:320px; min-height:290px;}
+      .animal{font-size:20px;}
+      .animal.compact{font-size:17px;}
+      .scene-bottom{padding:11px 5px 4px;}
+      .control-card{padding:18px;gap:13px;}
+      .event-btn{min-height:65px;}
+      .graph-card,.calc-card,.mission-card{padding:18px;}
+      .mission-card{margin-top:12px;}
+      .mission-grid{gap:8px;}
+      .mission-btn{padding:12px 10px;min-height:112px;}
+      .mission-btn .mission-name{font-size:13px;}
+      .mission-btn .mission-desc{font-size:10px;}
+      .below-grid{margin-top:12px;}
+      .lesson-note{margin-top:12px;}
+    }
+    @media(max-width:385px) {
+      .app{padding-left:10px;padding-right:10px;}
+      .scene{height:280px;min-height:280px;}
+      .scene-context,.small-helper{font-size:10px;}
+      .zone-caption{font-size:10px;left:8px;bottom:8px;padding:6px 8px;}
+      .animal{font-size:19px;}
+      .animal.compact{font-size:16px;}
+      .metric-main{font-size:24px;}
+      .species-title{font-size:13px;}
+      .mission-statement{font-size:12px;}
+      .mission-detail-top{flex-direction:column;}
+    }
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important;}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true"><svg width="27" height="27" viewBox="0 0 28 28" fill="none"><path d="M14 23V13m0 4c-5.5 0-9-3.5-9-9 5.5 0 9 3.5 9 9Zm0-5c0-5.5 3.5-9 9-9 0 5.5-3.5 9-9 9Z" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+        <div><div class="brand-name">POPULATION LAB</div><div class="brand-sub">개체군 밀도 실험실</div></div>
+      </div>
+      <div class="tag">생명과학 · 개체군의 특성</div>
+    </header>
+
+    <section class="intro">
+      <div class="eyebrow">INTERACTIVE ECOLOGY LAB</div>
+      <h1>동물의 수가 바뀌면, <span>밀도도 바뀔까?</span></h1>
+      <p>생물을 고르고, 출생·사망·이입·이출과 서식지 크기를 직접 바꾸며 개체군 밀도를 실험해 보세요.</p>
+    </section>
+
+    <section aria-label="생물 선택">
+      <div class="selector-heading"><h2>01. 관찰할 생물 선택</h2><span class="small-helper">한 번에 한 종만 관찰해요</span></div>
+      <div class="species-grid" id="speciesButtons">
+        <button class="species-card" type="button" data-species="rabbit" aria-pressed="true"><span class="species-emoji" aria-hidden="true">🐇</span><span><span class="species-title">토끼</span><span class="species-sub" style="display:block">초원 · ㎡</span></span><span class="selected-indicator" aria-hidden="true">✓</span></button>
+        <button class="species-card" type="button" data-species="lion" aria-pressed="false"><span class="species-emoji" aria-hidden="true">🦁</span><span><span class="species-title">사자</span><span class="species-sub" style="display:block">사바나 · ㎢</span></span><span class="selected-indicator" aria-hidden="true">✓</span></button>
+        <button class="species-card" type="button" data-species="fish" aria-pressed="false"><span class="species-emoji" aria-hidden="true">🐟</span><span><span class="species-title">물고기</span><span class="species-sub" style="display:block">연못 · ㎥</span></span><span class="selected-indicator" aria-hidden="true">✓</span></button>
+      </div>
+    </section>
+
+    <section class="lab-grid" aria-label="개체군 밀도 시뮬레이션">
+      <div class="card scene-card">
+        <div class="scene-top"><div class="live-tag"><span class="live-dot"></span>LIVE HABITAT</div><div class="scene-context" id="sceneSubtitle">초원에서 살아가는 토끼</div></div>
+        <div class="scene meadow" id="scene" role="img" aria-label="초원에 토끼 20마리가 살고 있습니다. 서식지 100제곱미터.">
+          <div class="sun"></div><div class="tree one"></div><div class="tree two"></div><div class="lily one"></div><div class="lily two"></div>
+          <div class="habitat-zone" id="habitatZone"><div id="animalField" aria-hidden="true"></div></div>
+          <div class="zone-caption" id="zoneCaption">관찰 영역 100㎡</div>
+          <div class="zone-label" id="sceneBadge">🐇 토끼 서식지</div>
+        </div>
+        <div class="scene-bottom"><span>점선 안의 <strong>관찰 영역</strong>에 주목해 보세요.</span><span class="hidden-count" id="visibilityNote">실제 개체 수가 화면에 표시됩니다.</span></div>
+      </div>
+
+      <div class="card control-card">
+        <div class="control-head"><h2>02. 개체군 조작하기</h2><button class="reset-btn" id="resetBtn" type="button">↻ 처음으로</button></div>
+        <div class="mission-ribbon" id="activeMissionMini" hidden><span class="mission-ribbon-tag" id="miniTitle">MISSION 01</span><strong id="miniDescription"></strong></div>
+        <div class="density-card">
+          <div class="density-title">현재 개체군 밀도</div>
+          <div class="density-row"><div class="density-number" id="density" aria-live="polite">0.200</div><div class="density-unit" id="densityUnit">마리/㎡</div></div>
+          <div class="density-trend" id="trend">기본 상태와 같습니다.</div>
+        </div>
+        <div class="metrics">
+          <div class="metric"><div class="metric-caption">현재 개체 수</div><div class="metric-main"><span id="population" style="font-size:inherit;color:inherit;margin:0">20</span><span>마리</span></div></div>
+          <div class="metric"><div class="metric-caption">서식지 크기</div><div class="metric-main"><span id="area" style="font-size:inherit;color:inherit;margin:0">100</span><span id="areaUnit">㎡</span></div></div>
+        </div>
+        <div class="panel-label"><h3>출생·사망·이입·이출</h3><small>버튼을 눌러 변화시키세요</small></div>
+        <div class="event-grid">
+          <button class="event-btn plus" type="button" data-event="birth"><span><span class="event-name">✦ 출생</span><span class="event-desc" style="display:block">새로운 개체 탄생</span></span><span class="count">+3</span></button>
+          <button class="event-btn minus" type="button" data-event="death"><span><span class="event-name">− 사망</span><span class="event-desc" style="display:block">개체가 사라짐</span></span><span class="count">−2</span></button>
+          <button class="event-btn plus" type="button" data-event="immigration"><span><span class="event-name">➜ 이입</span><span class="event-desc" style="display:block">외부에서 들어옴</span></span><span class="count">+4</span></button>
+          <button class="event-btn minus" type="button" data-event="emigration"><span><span class="event-name">↗ 이출</span><span class="event-desc" style="display:block">외부로 떠남</span></span><span class="count">−3</span></button>
+        </div>
+        <div class="panel-label"><h3>서식지 크기 변경</h3><small>개체 수는 그대로!</small></div>
+        <div class="areas" id="areaButtons">
+          <button type="button" class="area-btn" data-area="0.5" aria-pressed="false">½ 배</button>
+          <button type="button" class="area-btn" data-area="1" aria-pressed="true">1 배</button>
+          <button type="button" class="area-btn" data-area="2" aria-pressed="false">2 배</button>
+          <button type="button" class="area-btn" data-area="4" aria-pressed="false">4 배</button>
+        </div>
+        <p class="help-line">※ 실제 출생률 등을 예측하는 모델이 아닌 개념 학습용 가상 실험입니다.</p>
+      </div>
+    </section>
+
+    <section class="below-grid" aria-label="계산과 변화 기록">
+      <div class="card graph-card">
+        <div class="section-top"><h2>03. 밀도 변화 그래프</h2><span class="section-label" id="stepCount">변화 0회</span></div>
+        <div class="chart-wrap"><canvas id="densityChart" role="img" aria-label="개체군 밀도 변화 그래프. 아래 최근 변화 기록에서도 변화 과정을 확인할 수 있습니다."></canvas></div>
+        <div class="legend">개체군 밀도 (마리/관찰 영역 단위)</div>
+      </div>
+      <div class="card calc-card">
+        <div class="section-top"><h2>실시간 밀도 계산</h2><span class="section-label">계산 원리</span></div>
+        <div class="calc-inner">
+          <div class="formula-title">개체군 밀도 = 개체 수 ÷ 서식지 면적(또는 부피)</div>
+          <div class="frac"><div class="fraction"><span id="fractionTop">20마리</span><span id="fractionBottom">100㎡</span></div><span>=</span><span class="formula-num" id="fractionResult">0.200</span></div>
+          <div class="equation" id="equation">20 + 0 − 0 + 0 − 0 = 20마리</div>
+        </div>
+        <div class="log-head">최근 변화 기록</div>
+        <ul class="activity-list" id="activityList"><li><span class="activity-name">실험 시작</span><span class="activity-value">0.200마리/㎡</span></li></ul>
+      </div>
+    </section>
+
+    <section class="card mission-card" aria-label="도전 미션">
+      <div class="mission-title"><span class="mission-symbol" aria-hidden="true">🎯</span><h2>04. 개체군 미션 도전</h2></div>
+      <p class="mission-intro">토끼가 사는 초원을 배경으로 세 가지 미션을 해결해 보세요. 미션을 선택하면 조건이 초기화됩니다.</p>
+      <div class="mission-grid" id="missionButtons">
+        <button type="button" class="mission-btn" data-mission="0" aria-pressed="false"><span class="mission-no">MISSION 01 <span class="mission-complete" data-clear="0"></span></span><span><span class="mission-name" style="display:block">밀도 높이기</span><span class="mission-desc" style="display:block">면적을 유지하며 0.300 만들기</span></span></button>
+        <button type="button" class="mission-btn" data-mission="1" aria-pressed="false"><span class="mission-no">MISSION 02 <span class="mission-complete" data-clear="1"></span></span><span><span class="mission-name" style="display:block">면적의 비밀</span><span class="mission-desc" style="display:block">개체 수 그대로 밀도를 절반으로</span></span></button>
+        <button type="button" class="mission-btn" data-mission="2" aria-pressed="false"><span class="mission-no">MISSION 03 <span class="mission-complete" data-clear="2"></span></span><span><span class="mission-name" style="display:block">네 가지 변화</span><span class="mission-desc" style="display:block">네 요인을 모두 사용해 원래 밀도로</span></span></button>
+      </div>
+      <div class="mission-detail" id="missionDetail">
+        <div class="mission-detail-top"><p class="mission-statement" id="missionStatement"></p><button class="hint-btn" type="button" id="hintBtn">💡 힌트 보기</button></div>
+        <p class="hint-text" id="hintText"></p>
+        <div class="mission-success" id="missionSuccess" role="status">🎉 미션 성공! 개체군 밀도의 원리를 이해했어요.</div>
+      </div>
+    </section>
+
+    <aside class="lesson-note"><span class="bulb" aria-hidden="true">💡</span><div><strong>오늘의 핵심!</strong> 개체군 밀도는 일정한 면적이나 부피에 존재하는 같은 종의 개체 수입니다. 출생·이입은 개체 수를 늘리고, 사망·이출은 줄입니다. 개체 수가 일정하더라도 서식지 크기가 달라지면 밀도는 변할 수 있습니다.</div></aside>
+    <footer><span>POPULATION LAB · 탐구형 생명과학 수업</span><span>v1.0 · 오프라인에서도 실행 가능</span></footer>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      'use strict';
+      const SPECIES = {
+        rabbit: {name:'토끼', icon:'🐇', habitat:'초원', scene:'meadow', unit:'㎡', base:100, initial:20},
+        lion: {name:'사자', icon:'🦁', habitat:'사바나', scene:'savanna', unit:'㎢', base:10, initial:8},
+        fish: {name:'물고기', icon:'🐟', habitat:'연못', scene:'pond', unit:'㎥', base:100, initial:24}
+      };
+      const EVENTS = {
+        birth: {label:'출생', count:3, effect:1, counter:'birth'},
+        death: {label:'사망', count:2, effect:-1, counter:'death'},
+        immigration: {label:'이입', count:4, effect:1, counter:'immigration'},
+        emigration: {label:'이출', count:3, effect:-1, counter:'emigration'}
+      };
+      const MISSIONS = [
+        {statement:'서식지 100㎡를 유지한 채 토끼 개체군 밀도를 0.300마리/㎡로 만들어 보세요.', hint:'20마리가 30마리가 되어야 해요. 출생 +3을 두 번, 이입 +4를 한 번 사용해 보세요.', valid:s=>s.species==='rabbit'&&s.areaFactor===1&&s.population===30},
+        {statement:'토끼 20마리는 그대로 두고 밀도만 0.100마리/㎡로 낮춰 보세요.', hint:'개체 수가 그대로라면, 서식지의 면적을 두 배로 늘려 보세요.', valid:s=>s.species==='rabbit'&&s.population===20&&s.areaFactor===2},
+        {statement:'출생·사망·이입·이출을 모두 한 번 이상 사용하면서 개체군 밀도를 처음 값인 0.200마리/㎡로 되돌려 보세요. (서식지 100㎡ 유지)', hint:'출생 +3, 이입 +4, 사망 −2를 두 번, 이출 −3을 한 번 사용하면 개체 수가 다시 20이 돼요.', valid:s=>s.species==='rabbit'&&s.areaFactor===1&&s.population===20&&s.counters.birth>0&&s.counters.death>0&&s.counters.immigration>0&&s.counters.emigration>0}
+      ];
+      const $ = id => document.getElementById(id);
+      const elements = {
+        scene:$('scene'), zone:$('habitatZone'), field:$('animalField'), sceneSubtitle:$('sceneSubtitle'),
+        sceneBadge:$('sceneBadge'), zoneCaption:$('zoneCaption'), density:$('density'), densityUnit:$('densityUnit'),
+        population:$('population'), area:$('area'), areaUnit:$('areaUnit'), trend:$('trend'),
+        fractionTop:$('fractionTop'), fractionBottom:$('fractionBottom'), fractionResult:$('fractionResult'),
+        equation:$('equation'), activityList:$('activityList'), chart:$('densityChart'), stepCount:$('stepCount'),
+        visibilityNote:$('visibilityNote'), missionDetail:$('missionDetail'), missionStatement:$('missionStatement'),
+        hintText:$('hintText'), hintBtn:$('hintBtn'), missionSuccess:$('missionSuccess'), toast:$('toast')
+      };
+      const MAX_ANIMALS = 72;
+      const bounds = {0.5:[34,33.23], 1:[48,47], 2:[67.88,66.47], 4:[96,94]};
+      let animals=[];
+      let toastTimeout=0;
+      let hintOpen=false;
+      let state;
+
+      function newState(species, mission=null, completed=null) {
+        const sp=SPECIES[species];
+        return {species, population:sp.initial, areaFactor:1,
+          counters:{birth:0,death:0,immigration:0,emigration:0},
+          history:[{density:sp.initial/sp.base,label:'시작'}],
+          logs:[{label:'실험 시작', value:sp.initial/sp.base}],
+          activeMission:mission, missionSolved:false, completed:completed || new Set()};
+      }
+      state=newState('rabbit');
+      const getSp=()=>SPECIES[state.species];
+      const getArea=()=>getSp().base*state.areaFactor;
+      const getDensity=()=>state.population/getArea();
+      const fixed=value=>value.toFixed(3);
+
+      function toast(message) {
+        clearTimeout(toastTimeout);
+        elements.toast.textContent=message;
+        elements.toast.classList.add('show');
+        toastTimeout=setTimeout(()=>elements.toast.classList.remove('show'),2300);
+      }
+      function clearAnimals() {
+        elements.field.replaceChildren();
+        animals=[];
+      }
+      function addAnimal(animate,mode) {
+        const animal=document.createElement('span');
+        animal.className='animal'+(animate?(mode==='immigration'?' incoming':' born'):'')+(state.population>48?' compact':'');
+        // A small margin prevents sprites from being hidden by the observation boundary.
+        // Low-discrepancy placement spreads initial animals across the whole plot.
+        const index=animals.length;
+        animal.style.left=(10+80*((index*0.61803398875+0.23)%1))+'%';
+        animal.style.top=(12+76*((index*0.41421356237+0.39)%1))+'%';
+        animal.style.setProperty('--delay',(-Math.random()*4).toFixed(2)+'s');
+        const inner=document.createElement('span');
+        inner.className='sway';
+        inner.textContent=getSp().icon;
+        animal.appendChild(inner);
+        elements.field.appendChild(animal);
+        animals.push(animal);
+        if(animate) setTimeout(()=>animal.classList.remove('born','incoming'),1000);
+      }
+      function syncAnimals(animateNew=false,mode='birth') {
+        const target=Math.min(MAX_ANIMALS,state.population);
+        while(animals.length>target){
+          const victim=animals.pop();
+          victim.classList.add(mode==='emigration'?'outgoing':'leaving');
+          setTimeout(()=>victim.remove(),mode==='emigration'?830:440);
+        }
+        while(animals.length<target) addAnimal(animateNew,mode);
+        const compact=state.population>48;
+        animals.forEach(el=>el.classList.toggle('compact',compact));
+      }
+      function reset(species=state.species, mission=null, message='실험을 처음부터 시작합니다.') {
+        const completed=state.completed;
+        state=newState(species,mission,completed);
+        hintOpen=false;
+        clearAnimals();
+        syncAnimals(false);
+        render();
+        if(message)toast(message);
+      }
+      function record(label,mode='birth') {
+        const density=getDensity();
+        state.history.push({density,label});
+        state.logs.unshift({label,value:density});
+        if(state.history.length>45) state.history.shift();
+        if(state.logs.length>6) state.logs.pop();
+        checkMission();
+        render(mode);
+      }
+      function changeEvent(key) {
+        const event=EVENTS[key];
+        const before=state.population;
+        const delta=event.effect===1 ? event.count : -Math.min(event.count,before);
+        if(delta===0){toast('개체 수는 0보다 작을 수 없어요.');return;}
+        state.population+=delta;
+        state.counters[event.counter]+=Math.abs(delta);
+        record(event.label+' '+(delta>0?'+':'')+delta+'마리',key);
+      }
+      function changeArea(factor) {
+        if(state.areaFactor===factor)return;
+        state.areaFactor=factor;
+        record('서식지 '+getArea()+getSp().unit+'로 변경','area');
+        toast('같은 개체 수라도 서식지 크기가 변하면 밀도가 달라져요!');
+      }
+      function checkMission() {
+        const index=state.activeMission;
+        if(index===null||state.missionSolved)return;
+        if(MISSIONS[index].valid(state)){
+          state.missionSolved=true;
+          state.completed.add(index);
+          toast('🎉 미션 '+(index+1)+' 성공! 다른 미션에도 도전해 보세요.');
+        }
+      }
+      function render(mode='birth') {
+        const sp=getSp(), area=getArea(), density=getDensity();
+        elements.scene.className='scene '+sp.scene;
+        elements.sceneSubtitle.textContent=sp.habitat+'에서 살아가는 '+sp.name;
+        elements.sceneBadge.textContent=sp.icon+' '+sp.name+' 서식지';
+        elements.zoneCaption.textContent='관찰 영역 '+area+sp.unit;
+        elements.scene.setAttribute('aria-label',sp.habitat+'에서 '+sp.name+' '+state.population+'마리가 살고 있습니다. 서식지 '+area+sp.unit+'. 밀도 '+fixed(density)+'마리/'+sp.unit+'.');
+        elements.density.textContent=fixed(density);
+        elements.densityUnit.textContent='마리/'+sp.unit;
+        elements.population.textContent=state.population;
+        elements.area.textContent=area;
+        elements.areaUnit.textContent=sp.unit;
+        elements.fractionTop.textContent=state.population+'마리';
+        elements.fractionBottom.textContent=area+sp.unit;
+        elements.fractionResult.textContent=fixed(density);
+        elements.equation.textContent=sp.initial+' + '+state.counters.birth+' − '+state.counters.death+' + '+state.counters.immigration+' − '+state.counters.emigration+' = '+state.population+'마리';
+        const initialDensity=sp.initial/sp.base, difference=density-initialDensity;
+        elements.trend.textContent=Math.abs(difference)<0.000000001?'기본 상태와 같습니다.': '기본 상태보다 '+fixed(Math.abs(difference))+'마리/'+sp.unit+' '+(difference>0?'높아요 ↑':'낮아요 ↓');
+        elements.stepCount.textContent='변화 '+Math.max(0,state.history.length-1)+'회';
+        elements.zone.style.width=bounds[state.areaFactor][0]+'%';
+        elements.zone.style.height=bounds[state.areaFactor][1]+'%';
+        elements.visibilityNote.textContent=state.population>MAX_ANIMALS ? '화면에는 최대 '+MAX_ANIMALS+'마리까지 표시' : '개체 '+state.population+'마리 표시 중';
+        document.querySelectorAll('[data-species]').forEach(btn=>btn.setAttribute('aria-pressed',String(btn.dataset.species===state.species)));
+        document.querySelectorAll('[data-area]').forEach(btn=>btn.setAttribute('aria-pressed',String(Number(btn.dataset.area)===state.areaFactor)));
+        document.querySelectorAll('[data-event]').forEach(btn=>{const e=EVENTS[btn.dataset.event];btn.disabled=e.effect<0&&state.population===0;});
+        elements.activityList.replaceChildren();
+        state.logs.slice(0,4).forEach(log=>{
+          const li=document.createElement('li');
+          const label=document.createElement('span');label.className='activity-name';label.textContent=log.label;
+          const value=document.createElement('span');value.className='activity-value';value.textContent=fixed(log.value)+'마리/'+sp.unit;
+          li.append(label,value);elements.activityList.appendChild(li);
+        });
+        const mission=state.activeMission;
+        document.querySelectorAll('[data-mission]').forEach(btn=>btn.setAttribute('aria-pressed',String(Number(btn.dataset.mission)===mission)));
+        document.querySelectorAll('[data-clear]').forEach(el=>{el.textContent=state.completed.has(Number(el.dataset.clear))?'✓ 완료':'';});
+        elements.missionDetail.classList.toggle('active',mission!==null);
+        $('activeMissionMini').hidden=mission===null;
+        if(mission!==null){
+          $('miniTitle').textContent='MISSION '+String(mission+1).padStart(2,'0')+(state.missionSolved?' · ✓ 완료':' · 도전 중');
+          $('miniDescription').textContent=MISSIONS[mission].statement;
+        }
+        if(mission!==null){
+          elements.missionStatement.textContent=MISSIONS[mission].statement;
+          elements.hintText.textContent=MISSIONS[mission].hint;
+          elements.hintText.classList.toggle('active',hintOpen);
+          elements.hintBtn.textContent=hintOpen?'힌트 닫기':'💡 힌트 보기';
+          elements.missionSuccess.classList.toggle('active',state.missionSolved);
+        }
+        syncAnimals(true,mode);
+        drawChart();
+      }
+      function drawChart() {
+        const canvas=elements.chart;
+        const rect=canvas.getBoundingClientRect();
+        if(rect.width===0||rect.height===0)return;
+        const ratio=Math.min(window.devicePixelRatio||1,2);
+        canvas.width=Math.round(rect.width*ratio);
+        canvas.height=Math.round(rect.height*ratio);
+        const ctx=canvas.getContext('2d');
+        ctx.scale(ratio,ratio);
+        const w=rect.width,h=rect.height;
+        ctx.clearRect(0,0,w,h);
+        const pad={left:46,right:20,top:17,bottom:27};
+        const pw=Math.max(40,w-pad.left-pad.right),ph=h-pad.top-pad.bottom;
+        const series=state.history;
+        const maximum=Math.max(...series.map(p=>p.density),0.08);
+        const maxY=Math.ceil((maximum*1.22)/0.1)*0.1 || 0.1;
+        ctx.font='11px "Malgun Gothic",sans-serif';
+        ctx.textAlign='right';ctx.textBaseline='middle';
+        for(let i=0;i<=4;i++){
+          const y=pad.top+(ph/4)*i;
+          ctx.beginPath();ctx.strokeStyle='#e6efeb';ctx.lineWidth=1;ctx.moveTo(pad.left,y);ctx.lineTo(w-pad.right,y);ctx.stroke();
+          ctx.fillStyle='#91a49a';ctx.fillText(fixed(maxY*(4-i)/4),pad.left-8,y);
+        }
+        ctx.fillStyle='#8ca099';ctx.textBaseline='alphabetic';
+        ctx.textAlign='center';
+        ctx.fillText('시작',pad.left,h-7);
+        if(series.length>1)ctx.fillText('현재 ('+(series.length-1)+'회)',w-pad.right,h-7);
+        const points=series.map((p,i)=>({x:pad.left+(series.length===1?0:i/(series.length-1)*pw),y:pad.top+ph-(p.density/maxY)*ph}));
+        if(points.length>1){
+          const fill=ctx.createLinearGradient(0,pad.top,0,pad.top+ph);
+          fill.addColorStop(0,'rgba(43,175,129,.19)');fill.addColorStop(1,'rgba(43,175,129,0)');
+          ctx.beginPath();ctx.moveTo(points[0].x,pad.top+ph);
+          points.forEach(p=>ctx.lineTo(p.x,p.y));ctx.lineTo(points[points.length-1].x,pad.top+ph);ctx.closePath();ctx.fillStyle=fill;ctx.fill();
+          ctx.beginPath();points.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
+          ctx.lineJoin='round';ctx.lineWidth=3;ctx.strokeStyle='#2aa779';ctx.stroke();
+        }
+        points.forEach((p,i)=>{
+          if(points.length>17 && i!==0&&i!==points.length-1)return;
+          ctx.beginPath();ctx.arc(p.x,p.y,i===points.length-1?5:3,0,Math.PI*2);
+          ctx.fillStyle='#fff';ctx.fill();ctx.strokeStyle='#1e9b70';ctx.lineWidth=2;ctx.stroke();
+        });
+      }
+      document.querySelectorAll('[data-species]').forEach(btn=>btn.addEventListener('click',()=>reset(btn.dataset.species,null,btn.querySelector('.species-title').textContent+' 개체군을 관찰합니다.')));
+      document.querySelectorAll('[data-event]').forEach(btn=>btn.addEventListener('click',()=>changeEvent(btn.dataset.event)));
+      document.querySelectorAll('[data-area]').forEach(btn=>btn.addEventListener('click',()=>changeArea(Number(btn.dataset.area))));
+      document.querySelectorAll('[data-mission]').forEach(btn=>btn.addEventListener('click',()=>{
+        const index=Number(btn.dataset.mission);
+        reset('rabbit',index,'미션 '+(index+1)+' 시작! 조건을 달성해 보세요.');
+        document.querySelector('.control-card').scrollIntoView({behavior:'smooth',block:'start'});
+      }));
+      $('resetBtn').addEventListener('click',()=>reset(state.activeMission!==null?'rabbit':state.species,state.activeMission));
+      elements.hintBtn.addEventListener('click',()=>{hintOpen=!hintOpen;elements.hintText.classList.toggle('active',hintOpen);elements.hintBtn.textContent=hintOpen?'힌트 닫기':'💡 힌트 보기';});
+      let resizeQueued=false;
+      window.addEventListener('resize',()=>{if(resizeQueued)return;resizeQueued=true;requestAnimationFrame(()=>{resizeQueued=false;drawChart();});});
+      // Gentle roaming helps distinguish the moving organisms from static markers.
+      setInterval(()=>{
+        if(document.hidden)return;
+        animals.forEach(el=>{
+          if(Math.random()>.36)return;
+          const x=parseFloat(el.style.left),y=parseFloat(el.style.top);
+          el.style.left=Math.min(91,Math.max(9,x+(Math.random()-.5)*24))+'%';
+          el.style.top=Math.min(80,Math.max(11,y+(Math.random()-.5)*19))+'%';
+        });
+      },3300);
+      clearAnimals();syncAnimals(false);render();
+    })();
+  </script>
+</body>
+</html>
