@@ -248,6 +248,125 @@
       .mission-detail-top{flex-direction:column;}
     }
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important;}}
+
+    /* Mobile-first interaction layer: compact field, thumb-friendly controls and always-visible live density. */
+    .scene-action,.mobile-dock {display:none;}
+    #controlPanel,#graphPanel,#missionPanel {scroll-margin-top:14px;}
+    @media (max-width:760px) {
+      html {scroll-behavior:smooth;}
+      .app {padding:12px 11px calc(118px + env(safe-area-inset-bottom));}
+      .topbar {gap:6px;}
+      .brand {gap:8px;}
+      .brand-icon {height:34px;width:34px;flex:0 0 34px;border-radius:10px;}
+      .brand-icon svg {width:23px;height:23px;}
+      .brand-name {font-size:12px;letter-spacing:.025em;}
+      .brand-sub {font-size:10px;margin-top:1px;}
+      .tag {font-size:10px;padding:6px 8px;letter-spacing:-.045em;}
+      .intro {margin:12px 2px 14px;}
+      .eyebrow {font-size:9px;letter-spacing:.08em;}
+      .eyebrow::before {width:13px;}
+      h1 {font-size:clamp(22px,6.1vw,27px);line-height:1.2;margin:6px 0 6px;letter-spacing:-.06em;}
+      .intro p {font-size:12px;line-height:1.5;}
+      .selector-heading {margin-bottom:7px;}
+      .selector-heading h2 {font-size:13px;}
+      .small-helper {font-size:10px;}
+      .species-grid {gap:7px;margin-bottom:10px;}
+      .species-card {display:flex;flex-direction:row;gap:5px;text-align:left;min-height:55px;padding:6px;justify-content:center;border-radius:12px;box-shadow:0 2px 12px rgba(14,46,55,.035);}
+      .species-emoji {width:32px;height:32px;flex:0 0 32px;font-size:21px;border-radius:10px;}
+      .species-title {font-size:13px;white-space:nowrap;}
+      .species-sub {display:none !important;}
+      .lab-grid,.below-grid {gap:10px;}
+      .card {border-radius:18px;}
+      .scene-card {padding:8px;}
+      .scene-top {padding:4px 6px 8px;}
+      .live-tag {font-size:10px;}
+      .live-dot {width:7px;height:7px;box-shadow:0 0 0 3px #e3f6ee;}
+      .scene-context {font-size:10px;}
+      .scene {height:clamp(195px,54vw,245px);min-height:195px;border-radius:13px;}
+      .sun {width:37px;height:37px;top:25px;right:35px;box-shadow:0 0 0 11px rgba(255,255,255,.14);}
+      .tree {scale:.7;transform-origin:bottom;}
+      .tree.one {left:5px;bottom:13px;}
+      .tree.two {right:14px;bottom:18px;}
+      .habitat-zone {border-width:2px;border-radius:15px;}
+      .animal {font-size:17px;}
+      .animal.compact {font-size:15px;}
+      .zone-label {font-size:10px;top:9px;left:9px;padding:6px 8px;border-radius:8px;}
+      .zone-caption {font-size:10px;bottom:8px;left:8px;padding:6px 8px;}
+      .scene-bottom {padding:7px 4px 0;gap:5px;min-height:37px;}
+      .scene-instruction {display:none;}
+      .hidden-count {margin-right:auto;text-align:left;font-size:10px;}
+      .scene-action {display:inline-flex;align-items:center;justify-content:center;min-height:33px;background:#e7f4eb;color:#1c845e;border:1px solid #d2e9da;padding:7px 11px;border-radius:10px;font-size:11px;font-weight:850;white-space:nowrap;}
+      .control-card {padding:12px;gap:9px;}
+      .control-head h2 {font-size:15px;}
+      .reset-btn {min-height:39px;padding:7px 11px;font-size:12px;}
+      .mission-ribbon {padding:8px 10px;gap:3px;}
+      .mission-ribbon strong {font-size:11px;}
+      .density-card {border-radius:13px;padding:12px 14px;}
+      .density-title {font-size:11px;}
+      .density-row {margin-top:3px;gap:7px;}
+      .density-number {font-size:38px;line-height:1.06;}
+      .density-unit {font-size:12px;}
+      .density-trend {font-size:11px;margin-top:3px;min-height:15px;}
+      .metrics {gap:8px;}
+      .metric {padding:9px 12px;border-radius:12px;}
+      .metric-caption {font-size:10px;}
+      .metric-main {font-size:22px;margin-top:2px;}
+      .metric-main span {font-size:11px;}
+      .panel-label {margin-top:2px;}
+      .panel-label h3 {font-size:12px;}
+      .panel-label small {font-size:10px;}
+      .event-grid {gap:8px;}
+      .event-btn {min-height:62px;padding:9px 12px;border-radius:12px;}
+      .event-btn .event-name {font-size:15px;}
+      .event-btn .event-desc {font-size:10px;margin-top:3px;}
+      .event-btn .count {font-size:15px;}
+      .areas {gap:6px;}
+      .area-btn {min-height:47px;padding:8px 3px;font-size:13px;}
+      .help-line {font-size:10px;line-height:1.45;margin-top:0;}
+      .below-grid {margin-top:10px;}
+      .graph-card,.calc-card,.mission-card {padding:14px;}
+      .section-top {margin-bottom:11px;}
+      .section-top h2,.mission-title h2 {font-size:15px;}
+      .chart-wrap {height:178px;}
+      .legend {font-size:10px;}
+      .mission-card {margin-top:10px;overflow:hidden;}
+      .mission-intro {margin:8px 0 12px;font-size:12px;}
+      .mission-grid {display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 1px 8px;overscroll-behavior-x:contain;scrollbar-width:thin;}
+      .mission-btn {flex:0 0 min(70%,220px);min-height:100px;scroll-snap-align:start;padding:12px 13px;}
+      .mission-btn .mission-no,.mission-btn .mission-desc {font-size:11px;}
+      .mission-btn .mission-name {font-size:14px;}
+      .mission-detail {padding:12px;margin-top:8px;}
+      .mission-detail-top {flex-direction:column;}
+      .mission-statement {font-size:13px;}
+      .hint-btn {min-height:40px;font-size:12px;}
+      .lesson-note {padding:12px 14px;gap:7px;font-size:12px;margin-top:10px;}
+      footer {margin-top:14px;font-size:10px;flex-wrap:wrap;}
+      .mobile-dock {position:fixed;z-index:80;display:flex;align-items:stretch;bottom:calc(7px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:calc(100% - 20px);max-width:520px;min-height:67px;border:1px solid #dae9e1;background:rgba(255,255,255,.97);backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);border-radius:18px;padding:5px;box-shadow:0 8px 35px rgba(24,63,48,.16);}
+      .dock-button {border:0;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:0;min-height:57px;padding:5px 7px;color:#5c7c6d;border-radius:13px;font-weight:800;}
+      .dock-button:active {background:#e2f5e9;}
+      .dock-density {flex:1.7;align-items:flex-start;background:#e6f6ed;padding-left:13px;color:#1b6e4c;}
+      .dock-label {font-size:10px;font-weight:850;white-space:nowrap;}
+      .dock-reading {display:flex;gap:5px;align-items:baseline;white-space:nowrap;}
+      .dock-reading strong {font-size:21px;font-weight:950;font-variant-numeric:tabular-nums;letter-spacing:-.055em;}
+      .dock-reading small {font-size:10px;font-weight:700;}
+      .dock-link {flex:1;gap:3px;font-size:11px;white-space:nowrap;}
+      .dock-icon {font-size:20px;font-weight:750;line-height:1.2;color:#2b8a67;}
+      .toast {bottom:calc(83px + env(safe-area-inset-bottom));font-size:12px;}
+    }
+    @media(max-width:350px) {
+      .app {padding-left:8px;padding-right:8px;}
+      .tag {font-size:9px;padding:6px;}
+      .scene-context {font-size:9px;}
+      .species-card {gap:3px;padding:5px 3px;min-height:53px;}
+      .species-emoji {width:29px;height:29px;flex-basis:29px;font-size:19px;}
+      .species-title {font-size:12px;}
+      .control-card {padding:10px;}
+      .event-btn {padding:8px 10px;}
+      .panel-label small {font-size:9px;}
+      .dock-density {padding-left:8px;}
+      .dock-reading strong {font-size:19px;}
+      .dock-link {font-size:10px;padding:5px 2px;}
+    }
   </style>
 </head>
 <body>
@@ -276,7 +395,7 @@
     </section>
 
     <section class="lab-grid" aria-label="개체군 밀도 시뮬레이션">
-      <div class="card scene-card">
+      <div class="card scene-card" id="scenePanel">
         <div class="scene-top"><div class="live-tag"><span class="live-dot"></span>LIVE HABITAT</div><div class="scene-context" id="sceneSubtitle">초원에서 살아가는 토끼</div></div>
         <div class="scene meadow" id="scene" role="img" aria-label="초원에 토끼 20마리가 살고 있습니다. 서식지 100제곱미터.">
           <div class="sun"></div><div class="tree one"></div><div class="tree two"></div><div class="lily one"></div><div class="lily two"></div>
@@ -284,10 +403,10 @@
           <div class="zone-caption" id="zoneCaption">관찰 영역 100㎡</div>
           <div class="zone-label" id="sceneBadge">🐇 토끼 서식지</div>
         </div>
-        <div class="scene-bottom"><span>점선 안의 <strong>관찰 영역</strong>에 주목해 보세요.</span><span class="hidden-count" id="visibilityNote">실제 개체 수가 화면에 표시됩니다.</span></div>
+        <div class="scene-bottom"><span class="scene-instruction">점선 안의 <strong>관찰 영역</strong>에 주목해 보세요.</span><span class="hidden-count" id="visibilityNote">실제 개체 수가 화면에 표시됩니다.</span><button class="scene-action" type="button" data-scroll-target="controlPanel">조작하기 ↓</button></div>
       </div>
 
-      <div class="card control-card">
+      <div class="card control-card" id="controlPanel">
         <div class="control-head"><h2>02. 개체군 조작하기</h2><button class="reset-btn" id="resetBtn" type="button">↻ 처음으로</button></div>
         <div class="mission-ribbon" id="activeMissionMini" hidden><span class="mission-ribbon-tag" id="miniTitle">MISSION 01</span><strong id="miniDescription"></strong></div>
         <div class="density-card">
@@ -318,7 +437,7 @@
     </section>
 
     <section class="below-grid" aria-label="계산과 변화 기록">
-      <div class="card graph-card">
+      <div class="card graph-card" id="graphPanel">
         <div class="section-top"><h2>03. 밀도 변화 그래프</h2><span class="section-label" id="stepCount">변화 0회</span></div>
         <div class="chart-wrap"><canvas id="densityChart" role="img" aria-label="개체군 밀도 변화 그래프. 아래 최근 변화 기록에서도 변화 과정을 확인할 수 있습니다."></canvas></div>
         <div class="legend">개체군 밀도 (마리/관찰 영역 단위)</div>
@@ -335,7 +454,7 @@
       </div>
     </section>
 
-    <section class="card mission-card" aria-label="도전 미션">
+    <section class="card mission-card" id="missionPanel" aria-label="도전 미션">
       <div class="mission-title"><span class="mission-symbol" aria-hidden="true">🎯</span><h2>04. 개체군 미션 도전</h2></div>
       <p class="mission-intro">토끼가 사는 초원을 배경으로 세 가지 미션을 해결해 보세요. 미션을 선택하면 조건이 초기화됩니다.</p>
       <div class="mission-grid" id="missionButtons">
@@ -351,8 +470,16 @@
     </section>
 
     <aside class="lesson-note"><span class="bulb" aria-hidden="true">💡</span><div><strong>오늘의 핵심!</strong> 개체군 밀도는 일정한 면적이나 부피에 존재하는 같은 종의 개체 수입니다. 출생·이입은 개체 수를 늘리고, 사망·이출은 줄입니다. 개체 수가 일정하더라도 서식지 크기가 달라지면 밀도는 변할 수 있습니다.</div></aside>
-    <footer><span>POPULATION LAB · 탐구형 생명과학 수업</span><span>v1.0 · 오프라인에서도 실행 가능</span></footer>
+    <footer><span>POPULATION LAB · 탐구형 생명과학 수업</span><span>v1.1 · 모바일 최적화 · 오프라인 실행 가능</span></footer>
   </div>
+  <nav class="mobile-dock" aria-label="실험실 빠른 이동">
+    <button class="dock-button dock-density" type="button" data-scroll-target="controlPanel" aria-label="현재 밀도 확인 및 개체군 조작하기">
+      <span class="dock-label">현재 밀도 · 조작하기</span>
+      <span class="dock-reading"><strong id="dockDensity">0.200</strong> <small id="dockUnit">마리/㎡</small></span>
+    </button>
+    <button class="dock-button dock-link" type="button" data-scroll-target="graphPanel"><span class="dock-icon" aria-hidden="true">▥</span><span>그래프</span></button>
+    <button class="dock-button dock-link" type="button" data-scroll-target="missionPanel"><span class="dock-icon" aria-hidden="true">◎</span><span>도전 미션</span></button>
+  </nav>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script>
@@ -493,6 +620,8 @@
         elements.zoneCaption.textContent='관찰 영역 '+area+sp.unit;
         elements.scene.setAttribute('aria-label',sp.habitat+'에서 '+sp.name+' '+state.population+'마리가 살고 있습니다. 서식지 '+area+sp.unit+'. 밀도 '+fixed(density)+'마리/'+sp.unit+'.');
         elements.density.textContent=fixed(density);
+        $('dockDensity').textContent=fixed(density);
+        $('dockUnit').textContent='마리/'+sp.unit;
         elements.densityUnit.textContent='마리/'+sp.unit;
         elements.population.textContent=state.population;
         elements.area.textContent=area;
@@ -585,6 +714,10 @@
         const index=Number(btn.dataset.mission);
         reset('rabbit',index,'미션 '+(index+1)+' 시작! 조건을 달성해 보세요.');
         document.querySelector('.control-card').scrollIntoView({behavior:'smooth',block:'start'});
+      }));
+      document.querySelectorAll('[data-scroll-target]').forEach(btn=>btn.addEventListener('click',()=>{
+        const target=$(btn.dataset.scrollTarget);
+        if(target) target.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
       }));
       $('resetBtn').addEventListener('click',()=>reset(state.activeMission!==null?'rabbit':state.species,state.activeMission));
       elements.hintBtn.addEventListener('click',()=>{hintOpen=!hintOpen;elements.hintText.classList.toggle('active',hintOpen);elements.hintBtn.textContent=hintOpen?'힌트 닫기':'💡 힌트 보기';});
